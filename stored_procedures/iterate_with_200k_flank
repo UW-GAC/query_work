@@ -12,7 +12,7 @@ SELECT COUNT(*) FROM genedefs_20170503 INTO n;
 #SET n=41;
 SET i=0;
 WHILE i<n DO 
-  INSERT INTO procedure_test(group_id, chromosome, position, ref, alt)
+  INSERT INTO procedure_test_2k(group_id, chromosome, position, ref, alt)
 
 SELECT 
   (SELECT gene.gene_id) as group_id,  
