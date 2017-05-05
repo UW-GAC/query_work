@@ -1,0 +1,3 @@
+time mysql --defaults-file=~/.mysql-topmed-annotation.cnf  --defaults-group-suffix=_topmed_annotation_readonly_test -e "SELECT genedefs_20170503.gene_id as group_id,  genedefs_20170503.chr as chromosome,  chr1.\`[2]POS\` as position, chr1.\`[3]REF\` as ref, chr1.\`[4]ALT\` as alt FROM genedefs_20170503 JOIN chr1 ON genedefs_20170503.chr = chr1.\`# [1]CHROM\` AND chr1.\`[2]POS\` BETWEEN genedefs_20170503.start-200000 AND genedefs_20170503.end+200000 WHERE genedefs_20170503.chr = 1" > /projects/topmed/analysts/bheavner/joins/chr1_genes_20170503.txt
+
+

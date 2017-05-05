@@ -1,0 +1,28 @@
+SELECT 
+  genes.gene_id as group_id, 
+  genes.`chr` as chromosome, 
+  chr1.`[2]POS` as position, 
+  chr1.`[3]REF` as ref, 
+  chr1.`[4]ALT` as alt
+FROM 
+  Genedefs genes, chr1
+WHERE
+ chr1.`[2]POS` BETWEEN genes.agg_start AND genes.agg_end
+AND
+ genedefs.chr = 1
+
+I ran this:
+SELECT 
+  genedefs.gene_id as group_id,  
+  genedefs.chr as chromosome,  
+  chr1.`[2]POS` as position, 
+  chr1.`[3]REF` as ref, 
+  chr1.`[4]ALT` as alt 
+FROM 
+  genedefs 
+JOIN 
+  chr1 ON genedefs.chr = chr1.`# [1]CHROM` 
+AND 
+  chr1.`[2]POS` BETWEEN genedefs.agg_start AND genedefs.agg_end 
+WHERE 
+  genedefs.chr = 1

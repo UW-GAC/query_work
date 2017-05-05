@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS procedure_test
+      (group_id varchar(18), chromosome varchar(5), position int(11), ref char(1), alt char(1));
+
+DROP PROCEDURE IF EXISTS RANGEPERROW;
+DELIMITER ;;
+
+CREATE PROCEDURE RANGEPERROW()
+BEGIN
+DECLARE n INT DEFAULT 0;
+DECLARE i INT DEFAULT 0;
+SELECT COUNT(*) FROM genedefs_20170503 INTO n;
+#SET n=41;
+SET i=0;
+WHILE i<n DO 
+  INSERT INTO procedure_test(group_id, chromosome, position, ref, alt)
+
+SELECT 
+  (SELECT gene.gene_id) as group_id,  
+  (SELECT gene.chr) as chromosome,  
+  chr1.`[2]POS` as position, 
+  chr1.`[3]REF` as ref, 
+  chr1.`[4]ALT` as alt 
+FROM 
+  (Select * from genedefs_20170503 limit i, 1) as gene
+JOIN 
+  chr1 ON gene.chr = chr1.`# [1]CHROM` 
+AND 
+  chr1.`[2]POS` BETWEEN (SELECT start from genedefs_20170503 LIMIT i, 1) and (SELECT end from genedefs_20170503 LIMIT i, 1)
+WHERE 
+  gene.chr = 1;
+
+  SET i = i + 1;
+END WHILE;
+End;
+;;
+
+DELIMITER ;
+
+CALL RANGEPERROW();
+
