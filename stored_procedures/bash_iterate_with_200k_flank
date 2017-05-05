@@ -1,0 +1,1 @@
+mysql --defaults-file=~/.mysql-topmed-annotation.cnf  --defaults-group-suffix=_topmed_annotation_full_test -e "CALL RANGEPERROW_2K()"
