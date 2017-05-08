@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS unique_test (
     group_id varchar(18), 
-    chr varchar(5), 
+    chromosome varchar(5), 
     position int(11), 
     ref char(1), 
     alt char(1),
-    UNIQUE KEY variant (group_id, chr, position, ref, alt)
+    UNIQUE KEY variant (group_id, chromosome, position, ref, alt)
 );
 
 
@@ -19,7 +19,7 @@ SELECT COUNT(*) FROM genedefs_20170503 INTO n;
 #SET n=41;
 SET i=0;
 WHILE i<n DO 
-  INSERT IGNORE INTO procedure_test(group_id, chromosome, position, ref, alt)
+  INSERT IGNORE INTO unique_test(group_id, chromosome, position, ref, alt)
 
 SELECT 
   (SELECT gene.gene_id) as group_id,  
