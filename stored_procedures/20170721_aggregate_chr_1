@@ -1,0 +1,45 @@
+CREATE TABLE IF NOT EXISTS aggregates_20170720_chr_1 (
+     group_id varchar(18), 
+     chromosome varchar(5), 
+     position int(11), 
+     ref varchar(100), 
+     alt varchar(100),
+     UNIQUE `variant`(`group_id`, `chromosome`, `position`, `ref`, `alt`)
+);
+
+DROP PROCEDURE IF EXISTS 02170721_aggregate_chr1;
+DELIMITER ;;
+
+CREATE PROCEDURE 02170721_aggregate_chr1()
+BEGIN
+DECLARE n INT DEFAULT 0;
+DECLARE i INT DEFAULT 0;
+SELECT COUNT(*) FROM aggregate_defs_20170720 INTO n;
+SET i=0;
+WHILE i<n DO 
+  INSERT IGNORE INTO aggregates_20170720(group_id, chromosome, position, ref, alt)
+
+SELECT 
+  (SELECT gene.gene_id) as group_id,  
+  (SELECT gene.chromosome) as chromosome,  
+  pilot_1_test.`pos` as position, 
+  pilot_1_test.`ref` as ref, 
+  pilot_1_test.`alt` as alt 
+FROM 
+  (Select * from aggregate_defs_20170720 where chromosome = 1 order by start limit i, 1) as gene
+JOIN 
+  pilot_1_test ON gene.chromosome = pilot_1_test.`chr` 
+AND 
+  pilot_1_test.`pos` BETWEEN (SELECT start from aggregate_defs_20170720 where chromosome = 1 order by start LIMIT i, 1) and (SELECT end from aggregate_defs_20170720 where chromosome = 1 order by start LIMIT i, 1);
+
+  SET i = i + 1;
+
+SELECT i as current;
+
+END WHILE;
+End;
+;;
+
+DELIMITER ;
+
+CALL 20170721_aggregate_chr1();

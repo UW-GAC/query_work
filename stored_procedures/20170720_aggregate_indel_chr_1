@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS aggregates_20170720 (
+CREATE TABLE IF NOT EXISTS aggregates_20170720_chr_1 (
      group_id varchar(18), 
      chromosome varchar(5), 
      position int(11), 
@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS aggregates_20170720 (
      UNIQUE `variant`(`group_id`, `chromosome`, `position`, `ref`, `alt`)
 );
 
-DROP PROCEDURE IF EXISTS aggregate_20170720;
+DROP PROCEDURE IF EXISTS 20170720_aggregate_indel_chr_1;
 DELIMITER ;;
 
-CREATE PROCEDURE aggregate_20170720(IN current_chr CHAR(2))
+CREATE PROCEDURE 20170720_aggregate_indel_chr_1(IN current_chr CHAR(2))
 BEGIN
 DECLARE n INT DEFAULT 0;
 DECLARE i INT DEFAULT 0;
@@ -41,4 +41,4 @@ End;
 
 DELIMITER ;
 
-CALL aggregate_20170720(1);
+CALL 20170720_aggregate_indel_chr_1(1);
