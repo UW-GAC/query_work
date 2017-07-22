@@ -1,0 +1,40 @@
+DROP PROCEDURE IF EXISTS 20170721_aggregate_indel_chr_3;
+DELIMITER ;;
+
+CREATE PROCEDURE 20170721_aggregate_indel_chr_3()
+BEGIN
+DECLARE n INT DEFAULT 0;
+DECLARE i INT DEFAULT 0;
+SELECT COUNT(*) FROM (Select * from aggregate_defs_20170720 where chromosome = 3) as foo INTO n;
+SET i=0;
+WHILE i<n+1 DO 
+  INSERT IGNORE INTO aggregates_20170721_chr_3(group_id, chromosome, position, ref, alt)
+
+SELECT 
+  (SELECT gene.gene_id) as group_id,  
+  (SELECT gene.chromosome) as chromosome,  
+  fr4_indel_chr3.`pos` as position, 
+  fr4_indel_chr3.`ref` as ref, 
+  fr4_indel_chr3.`alt` as alt 
+FROM 
+  (Select * from aggregate_defs_20170720 where chromosome = 3 order by start limit i, 1) as gene
+JOIN 
+  fr4_indel_chr3 ON gene.chromosome = fr4_indel_chr3.`chr` 
+AND 
+  fr4_indel_chr3.`pos` 
+  BETWEEN 
+    (SELECT start from aggregate_defs_20170720 where chromosome = 3 order by start LIMIT i, 1) 
+    and 
+    (SELECT end from aggregate_defs_20170720 where chromosome = 3 order by start LIMIT i, 1);
+
+  SET i = i + 1;
+
+SELECT i as current;
+
+END WHILE;
+End;
+;;
+
+DELIMITER ;
+
+CALL 20170721_aggregate_indel_chr_3();
