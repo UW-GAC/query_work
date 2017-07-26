@@ -1,0 +1,39 @@
+DROP PROCEDURE IF EXISTS 20170726_aggregate_indel_chr_18;
+DELIMITER ;;
+
+CREATE PROCEDURE 20170726_aggregate_indel_chr_18()
+BEGIN
+DECLARE n INT DEFAULT 0;
+DECLARE i INT DEFAULT 0;
+SELECT COUNT(*) FROM (Select * from aggregate_defs_20170720 where chromosome = "18") as foo INTO n;
+SET i=0;
+WHILE i<n+1 DO 
+  INSERT IGNORE INTO aggregates_20170726_chr_18(group_id, chromosome, position, ref, alt)
+
+SELECT 
+  (SELECT gene.gene_id) as group_id,  
+  (SELECT gene.chromosome) as chromosome,  
+  fr4_indel_chr18.`pos` as position, 
+  fr4_indel_chr18.`ref` as ref, 
+  fr4_indel_chr18.`alt` as alt 
+FROM 
+  (Select * from aggregate_defs_20170720 where chromosome = "18" order by start limit i, 1) as gene
+JOIN 
+  fr4_indel_chr18 ON gene.chromosome = fr4_indel_chr18.`chr` 
+AND 
+  fr4_indel_chr18.`pos` 
+  BETWEEN 
+    gene.start and gene.end;
+
+  SET i = i + 1;
+
+SELECT i as current;
+
+END WHILE;
+End;
+;;
+
+DELIMITER ;
+
+CALL 20170726_aggregate_indel_chr_18();
+
