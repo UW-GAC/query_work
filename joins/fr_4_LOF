@@ -1,0 +1,43 @@
+Goal: 
+aggregate variants that:
+1) fall within ranges defined in `/projects/topmed/gac_data/aggregation_units/gene_based/gencode_v19/gencode_v19_genes.txt`;
+2) the (truncated) gene_id from `/projects/topmed/gac_data/aggregation_units/gene_based/gencode_v19/gencode_v19_genes.txt` matches the `VEP_ensembl_Gene_ID` field from the wgsa annotation
+3) have VEP consequence of `transcript_ablation` `splice_acceptor_variant` `splice_donor_variant` `stop_gained` `frameshift_variant` `stop_lost` `start_lost` or `transcript_amplification`;
+
+- create table for LOF variants:
+CREATE TABLE IF NOT EXISTS fr_4_aggregates_LOF (
+group_id varchar(18),
+chromosome varchar(2),
+position int,
+ref varchar(100),
+alt varchar(100)
+);
+
+- aggregate chr 22 as a test to start
+
+INSERT IGNORE INTO fr_4_aggregates_LOF(group_id, chromosome, position, ref, alt)
+SELECT
+  freeze_4_chr_22.VEP_ensembl_Gene_ID as group_id,
+  gene.chr as chromosome,
+  freeze_4_chr_22.pos as position,
+  freeze_4_chr_22.ref as ref,
+  freeze_4_chr_22.alt as alt
+FROM 
+  (SELECT * FROM gene_defs_20171102 WHERE chr = 22) AS gene,
+  freeze_4_chr_22
+WHERE 
+  freeze_4_chr_22.pos BETWEEN gene.start and gene.end
+  AND
+  freeze_4_chr_22.VEP_ensembl_Gene_ID = LEFT(gene.gene_ID, 15)
+  AND
+  (freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%transcript_ablation%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%splice_acceptor_variant%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%splice_donor_variant%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%stop_gained%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%frameshift_variant%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%stop_lost%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%start_lost%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%start_lost%'
+    OR freeze_4_chr_22.VEP_ensembl_Consequence LIKE '%transcript_amplification%');
+
+
