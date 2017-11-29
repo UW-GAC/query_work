@@ -1,0 +1,13 @@
+INSERT IGNORE INTO fr_4_aggregates_genes(group_id, chromosome, position, ref, alt)
+SELECT
+freeze_4_chr_10.VEP_ensembl_Gene_ID as group_id,
+gene.chr as chromosome,
+freeze_4_chr_10.pos as position,
+freeze_4_chr_10.ref as ref,
+freeze_4_chr_10.alt as alt
+FROM
+(SELECT * FROM gene_defs_20171102 WHERE chr = 10) AS gene, freeze_4_chr_10
+WHERE
+freeze_4_chr_10.pos BETWEEN gene.start and gene.end
+AND
+freeze_4_chr_10.VEP_ensembl_Gene_ID = LEFT(gene.gene_ID, 15);
